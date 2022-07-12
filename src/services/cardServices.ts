@@ -1,4 +1,4 @@
-import { TransactionTypes, findByTypeAndEmployeeId, insert } from "../repositories/cardRepository.js";
+import { TransactionTypes, findByTypeAndEmployeeId, insert, findById as findCardById, update } from "../repositories/cardRepository.js";
 import { findByApiKey } from "../repositories/companyRepository.js";
 import {findById} from "../repositories/employeeRepository.js"
 import { faker } from "@faker-js/faker";
@@ -81,8 +81,53 @@ async function createCard(apiKey: string, employeeId: number, type: TransactionT
     await insert(data)
 }
 
+async function activateCard(id: number, securityCode: string, password: string){
+    const isCardRegistered = await findCardById(id)
+    if(!isCardRegistered){
+        throw{
+            type: "notFound",
+            message: "Card not found"
+        }
+    }
+    
+    const cardExpiration = new Date(`01/${isCardRegistered.expirationDate}`)
+    const today = new Date()
+    if(cardExpiration <= today){
+        throw{
+            type: "badRequest",
+            message: "This card has expired"
+        }
+    }
+
+    if(isCardRegistered.password){
+        throw{
+            type: "conflict",
+            message: "The card you are trying to activate is already active"
+        }
+    }
+
+    const cardSecurityCode = cryptr.decrypt(isCardRegistered.securityCode)
+    if (cardSecurityCode != securityCode){
+        throw{
+            type: "badRequest",
+            message: "Wrong security code"
+        }
+    }
+
+    const encryptedPassword = cryptr.encrypt(password)
+
+    await update(id, {password: encryptedPassword})
+// rn = cartao cadastrado, ok
+// não expirado, ok
+// não ativo,  ok
+// cvc veridficado, ok 
+// senha de 4 numeros, 
+// senha criptografada ok 
+}
+
 const cardServices = {
-    createCard
+    createCard,
+    activateCard
 }
 
 export default cardServices;

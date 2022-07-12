@@ -7,6 +7,9 @@ function errorTypes(error){
     if(error.type == "conflict"){
         return{status: 409, message: error.message}
     }
+    if(error.type == "badRequest"){
+        return{status: 400, message: error.message}
+    }
 
     return {status:500, message: "internal server error"}
 }

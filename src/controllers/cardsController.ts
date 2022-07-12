@@ -8,16 +8,17 @@ export async function createCard(req: Request, res: Response){
     const apiKey = req.headers["x-api-key"].toString();
 
     await cardServices.createCard(apiKey, employeeId, type)
-    // val = chave vem de x-api-key (header), type = 'groceries' || 'restaurant' || 'transport' || 'education' || 'health'
 
     res.sendStatus(201)
 } 
 
 
 export async function activateCard(req: Request, res: Response){
-    // update no cartao com id, infos recebidas: id, cvc, senha q o usuario quer usar
-    // estrutura mesma da função de cima
-    // rn = cartao cadastrado, não expirado, não ativo, cvc veridficado, senha de 4 numeros, senha criptografada
+    const {id, securityCode, password} : {id: number, securityCode: string, password: string} = req.body
+    
+    await cardServices.activateCard(id, securityCode, password)
+
+    res.sendStatus(200)
 }
 
 export async function viewTransactions(req: Request, res: Response){
