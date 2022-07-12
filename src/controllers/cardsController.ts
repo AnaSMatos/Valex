@@ -1,48 +1,23 @@
 import { Request, Response } from "express";
+import { TransactionTypes } from "../repositories/cardRepository.js";
+import cardServices from "../services/cardServices.js";
 
 
 export async function createCard(req: Request, res: Response){
-    // post nos cards, infos recebidas: employeeId, tipo, e a chave da empresa (q deve ser valida)
-    // {
-    //     id - gera automatico
-    //     empoyeeId - aqui vem o id do funcionario dono do cartao 
-    //     number - faker
-    //     cardHolderName - nome no formato fistname + middlename initials + lastname
-    //     securityCode - guardado de forma criptografada (gerar pela bib faker, cript pega cryptr)
-    //     expirationDate - data d hoje ams 5 anos a frente no formato MM/YY
-    //     password - null 
-    //     isVirtual - false (default) 
-    //     originalCardId - null 
-    //     isBlocked - false (default)
-    //     type - tipo do cartao 
-    // }
+    const {employeeId, type} : {employeeId: number, type: TransactionTypes} = req.body
+    const apiKey = req.headers["x-api-key"].toString();
+
+    await cardServices.createCard(apiKey, employeeId, type)
     // val = chave vem de x-api-key (header), type = 'groceries' || 'restaurant' || 'transport' || 'education' || 'health'
-    // rn = api key valida, empregado cadastrado, empregado nao ter um cartao do msm tipo,
-    // nome do cartao, exp date +5 anos, cvc gerado c faker, criptograf com cryptr
+
+    res.sendStatus(201)
 } 
+
 
 export async function activateCard(req: Request, res: Response){
     // update no cartao com id, infos recebidas: id, cvc, senha q o usuario quer usar
     // estrutura mesma da função de cima
-    // rn = cadastrado, não expirado, não ativo, cvc veridficado, senha de 4 numeros, senha criptografada
-}
-
-export async function viewCard(req: Request, res: Response){
-    //infos recebidas: id do empregado, senha dos cartões
-    // imagino q assim: {
-    //     employeeId
-    //     passwords: []
-    // }
-    // estrutura devolvida
-    // {
-    //     "cards": [{
-    //      "number": 5595 5595 5595 5595,
-    //      "cardholderName": "FULANO N SILVA",
-    //        "expirationDate": "04/30",
-    //      "securityCode": "397"
-    //     }]
-    //}
-    // rn = cadastrado, ativo, senha veridicado 
+    // rn = cartao cadastrado, não expirado, não ativo, cvc veridficado, senha de 4 numeros, senha criptografada
 }
 
 export async function viewTransactions(req: Request, res: Response){
@@ -56,16 +31,16 @@ export async function viewTransactions(req: Request, res: Response){
     //           { "id": 1, "cardId": 1, "timestamp": "21/01/2022", "amount": 40000 }
     //       ]
     //   }
-    // rn = cadastrado, balance: recharges - transactions
+    // rn = cartao cadastrado, balance: recharges - transactions
 }
 
 export async function blockCard(req: Request, res: Response){
     // recebo: id do cartao, senha do cartao
     // update no cartao, isBlocked = true
-    // rn = cadastrado, não expirado, não bloqueado, ver senha
+    // rn = cartao cadastrado, não expirado, não bloqueado, ver senha
 }
 
 export async function unblockCard(req: Request, res: Response){
     //recebo: id e senha
-    // rn = cadastrado, não expirado, bloqueado, ver senha
+    // rn = cartao cadastrado, não expirado, bloqueado, ver senha
 }
