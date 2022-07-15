@@ -1,14 +1,12 @@
 import { Request, Response } from "express";
+import {recharge} from "./../services/rechargeService.js"
 
 export async function rechargeCard(req: Request, res: Response){
-    //recebo: apikey da empresa, id do cartao
-    //postar a recarga assim: {
-    //     id (auto)
-    //     timeStamp(auto)
-    //     cardId
-    //     amount
-    // }
-    // 
-    //val = valores apenas acima de 0
-    //rn = cadastrado, ativo, não expirado, persistir recarga 
+    const {id} = req.params
+    const {amount} = req.body
+    const apiKey = req.headers["x-api-key"].toString();
+
+    await recharge(Number(id), apiKey, amount)
+
+    res.sendStatus(201)
 }
